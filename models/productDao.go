@@ -2,7 +2,7 @@ package models
 
 import "database/sql"
 
-// ProductDao
+// ProductDao operates basic commom operation in products tables
 type ProductDao struct {
 	Conn *sql.DB
 }
@@ -40,7 +40,7 @@ func (pd *ProductDao) Remove(id int64) error {
 	return err
 }
 
-// Update
+// Update changes the product by id
 func (pd *ProductDao) Update(product Product, id string) error {
 	stmt, err := pd.Conn.Prepare("UPDATE products SET name=$2, price=$3, quantity=$4 WHERE id=$1")
 	if err != nil {

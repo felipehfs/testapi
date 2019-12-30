@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/felipehfs/testapi/models"
 	"github.com/gorilla/mux"
 )
@@ -16,11 +17,20 @@ func CreateProduct(db *sql.DB) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var product models.Product
 		productDao := models.NewProductDao(db)
+		user := r.Context().Value("user")
+		mapClaims := user.(*jwt.Token).Claims.(jwt.MapClaims)
 
 		if err := json.NewDecoder(r.Body).Decode(&product); err != nil {
 			log.Println(err)
 			http.Error(w, "erro na sintaxe do JSON", http.StatusBadRequest)
 			return
+		}
+
+		id := int64(mapClaims["id"].(float64))
+
+		product.UserID = sql.NullInt64{
+			Int64: id,
+			Valid: true,
 		}
 
 		createdProduct, err := productDao.Create(product)

@@ -11,7 +11,7 @@ type UserDao struct {
 	Conn *sql.DB
 }
 
-// NewUserDao
+// NewUserDao instantiate userDado
 func NewUserDao(db *sql.DB) *UserDao {
 	return &UserDao{
 		Conn: db,
@@ -19,13 +19,15 @@ func NewUserDao(db *sql.DB) *UserDao {
 }
 
 // Create a new user instance
-func (userDao *UserDao) Create(user User) error {
-	stmt, err := userDao.Conn.Prepare("INSERT INTO users(name, email, password) VALUES($1, $2, $3)")
-	if err != nil {
-		return err
-	}
-	_, err = stmt.Exec(user.Name, user.Email, user.Password)
-	return err
+func (userDao *UserDao) Create(user User) (*User, error) {
+	query := `
+		INSERT INTO 
+			users(name, email, password) 
+		VALUES($1, $2, $3)
+		RETURNING id
+	`
+	err := userDao.Conn.QueryRow(query, user.Name, user.Email, user.Password).Scan(&user.ID)
+	return &user, err
 }
 
 // Find retrieves the user with correct email and password

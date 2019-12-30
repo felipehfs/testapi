@@ -55,15 +55,17 @@ func Register(db *sql.DB) http.Handler {
 
 		user.Password = string(bytes)
 
-		if err := userDao.Create(user); err != nil {
+		createdUser, err := userDao.Create(user)
+		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
 		// generating token
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-			"name":  user.Name,
-			"email": user.Email,
+			"id":    createdUser.ID,
+			"name":  createdUser.Name,
+			"email": createdUser.Email,
 			"exp":   time.Now().Add(time.Hour * time.Duration(1)).Unix(),
 			"iat":   time.Now().Unix(),
 		})
@@ -76,7 +78,7 @@ func Register(db *sql.DB) http.Handler {
 
 		response := map[string]string{
 			"token": tokenString,
-			"email": user.Email,
+			"email": createdUser.Email,
 		}
 
 		json.NewEncoder(w).Encode(response)
