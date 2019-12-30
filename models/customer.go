@@ -18,8 +18,9 @@ type Customer struct {
 
 // Order represent the client purchase
 type Order struct {
-	ID         int `json:"id,omitempty`
-	Status     int `json:"status,omitempty"`
-	CustomerID int `json:"customer_id,omitempty"`
-	ProductID  int `json:"product_id,omitemtpy"`
+	ID         int   `json:"id,omitempty`
+	Status     int   `json:"status,omitempty"`
+	CustomerID int   `json:"customer_id,omitempty"`
+	ProductID  int   `json:"product_id,omitempty"`
+	Author     int64 `json:"author"`
 }

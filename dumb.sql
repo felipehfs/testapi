@@ -27,3 +27,5 @@ CREATE TABLE orders (
     customerId INTEGER REFERENCES customers(id),
     productId INTEGER REFERENCES products(id)
 );
+
+ALTER TABLE orders ADD COLUMN author INTEGER REFERENCES users(id);
