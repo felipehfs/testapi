@@ -25,6 +25,23 @@ func (dao *CustomerDao) Create(customer Customer) error {
 	return err
 }
 
+// Update changes the customer by id
+func (dao *CustomerDao) Update(id string, customer Customer) error {
+	stmt, err := dao.DB.Prepare("UPDATE customers SET name=$2, email=$3 WHERE id=$1")
+
+	if err != nil {
+		return err
+	}
+
+	_, err = stmt.Exec(id, customer.Name, customer.Email)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Read retrieves all customers
 func (dao *CustomerDao) Read() ([]Customer, error) {
 	var customers []Customer

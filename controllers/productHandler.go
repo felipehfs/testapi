@@ -106,6 +106,7 @@ func FindProduct(db *sql.DB) http.Handler {
 		product, err := productDao.Find(id)
 
 		if err != nil {
+			log.Println(err)
 			switch err {
 			case sql.ErrNoRows:
 				http.Error(w, "Id não encontrado", http.StatusNotFound)

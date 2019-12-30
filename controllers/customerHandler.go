@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/felipehfs/testapi/models"
+	"github.com/gorilla/mux"
 )
 
 // CreateCustomer controller operates the insert in the database
@@ -41,5 +42,26 @@ func ReadCustomer(db *sql.DB) http.Handler {
 		}
 
 		json.NewEncoder(w).Encode(customers)
+	})
+}
+
+// UpdateCustomer changes the customer by id
+func UpdateCustomer(db *sql.DB) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		customerDao := models.NewCustomerDao(db)
+		vars := mux.Vars(r)
+		var customer models.Customer
+
+		if err := json.NewDecoder(r.Body).Decode(&customer); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if err := customerDao.Update(vars["id"], customer); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		json.NewEncoder(w).Encode(customer)
 	})
 }
