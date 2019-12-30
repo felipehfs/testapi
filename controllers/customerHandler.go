@@ -67,3 +67,22 @@ func UpdateCustomer(db *sql.DB) http.Handler {
 		json.NewEncoder(w).Encode(customer)
 	})
 }
+
+// RemoveCustomer removes the customer in the database
+func RemoveCustomer(db *sql.DB) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		customerDao := models.NewCustomerDao(db)
+		vars := mux.Vars(r)
+		if err := customerDao.Remove(vars["id"]); err != nil {
+			var statusCode int
+
+			if err == sql.ErrNoRows {
+				statusCode = http.StatusNotFound
+			} else {
+				statusCode = http.StatusInternalServerError
+			}
+
+			http.Error(w, err.Error(), statusCode)
+		}
+	})
+}

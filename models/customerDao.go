@@ -73,3 +73,11 @@ func (dao *CustomerDao) Read() ([]Customer, error) {
 
 	return customers, nil
 }
+
+// Remove excluses the customer by id
+func (dao CustomerDao) Remove(id string) (err error) {
+	query := `DELETE FROM customers WHERE id=$1`
+	stmt, err := dao.DB.Prepare(query)
+	_, err = stmt.Exec(id)
+	return
+}
