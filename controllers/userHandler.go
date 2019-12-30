@@ -8,6 +8,7 @@ import (
 	"time"
 
 	jwtmiddleware "github.com/auth0/go-jwt-middleware"
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/felipehfs/testapi/models"
@@ -38,16 +39,28 @@ func Register(db *sql.DB) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var user models.User
 		userDao := models.NewUserDao(db)
+
 		if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 			http.Error(w, "Erro na sintaxe do JSON", http.StatusBadRequest)
 			return
 		}
+
+		// generating password
+		bytes, err := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		user.Password = string(bytes)
 
 		if err := userDao.Create(user); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
+		// generating token
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 			"name":  user.Name,
 			"email": user.Email,
