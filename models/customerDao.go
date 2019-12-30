@@ -15,14 +15,17 @@ func NewCustomerDao(db *sql.DB) *CustomerDao {
 }
 
 // Create inserts the new custome in the database
-func (dao *CustomerDao) Create(customer Customer) error {
-	stmt, err := dao.DB.Prepare("INSERT INTO customers(name, email) VALUES($1, $2)")
+func (dao *CustomerDao) Create(customer Customer) (*Customer, error) {
+	query := `
+		INSERT INTO customers(name, email) VALUES($1, $2)
+		RETURNING id
+	`
+	err := dao.DB.QueryRow(query, customer.Name, customer.Email).Scan(&customer.ID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	_, err = stmt.Exec(customer.Name, customer.Email)
-	return err
+	return &customer, nil
 }
 
 // Update changes the customer by id

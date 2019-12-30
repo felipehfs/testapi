@@ -20,13 +20,15 @@ func CreateCustomer(db *sql.DB) http.Handler {
 			return
 		}
 
-		if err := customerDao.Create(customer); err != nil {
+		createdCustomer, err := customerDao.Create(customer)
+
+		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
 		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(customer)
+		json.NewEncoder(w).Encode(createdCustomer)
 	})
 }
 
