@@ -50,7 +50,7 @@ func ReadProduct(db *sql.DB) http.Handler {
 	})
 }
 
-// UpdateProduct
+// UpdateProduct change the product
 func UpdateProduct(db *sql.DB) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -70,7 +70,7 @@ func UpdateProduct(db *sql.DB) http.Handler {
 	})
 }
 
-// RemoveProduct
+// RemoveProduct removes the product in the database
 func RemoveProduct(db *sql.DB) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
@@ -92,7 +92,7 @@ func RemoveProduct(db *sql.DB) http.Handler {
 	})
 }
 
-// FindProduct
+// FindProduct searches the product by ID
 func FindProduct(db *sql.DB) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)

@@ -14,17 +14,18 @@ import (
 )
 
 const (
-	APP_KEY = "s3cr3t"
+	appKey = "s3cr3t"
 )
 
+// AuthMiddleware enables the jwt Authentication
 func AuthMiddleware(next http.Handler) http.Handler {
-	if len(APP_KEY) == 0 {
-		log.Fatal("HTTP server unable to start, expected an APP_KEY for JWT auth")
+	if len(appKey) == 0 {
+		log.Fatal("HTTP server unable to start, expected an appKey for JWT auth")
 	}
 
 	jwtMiddleware := jwtmiddleware.New(jwtmiddleware.Options{
 		ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
-			return []byte(APP_KEY), nil
+			return []byte(appKey), nil
 		},
 	})
 
@@ -54,7 +55,7 @@ func Register(db *sql.DB) http.Handler {
 			"iat":   time.Now().Unix(),
 		})
 
-		tokenString, err := token.SignedString([]byte(APP_KEY))
+		tokenString, err := token.SignedString([]byte(appKey))
 		if err != nil {
 			http.Error(w, "Generated token failed", http.StatusInternalServerError)
 			return
@@ -69,6 +70,7 @@ func Register(db *sql.DB) http.Handler {
 	})
 }
 
+// Login operates the api sign in
 func Login(db *sql.DB) http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -99,7 +101,7 @@ func Login(db *sql.DB) http.Handler {
 			"iat":   time.Now().Unix(),
 		})
 
-		tokenString, err := token.SignedString([]byte(APP_KEY))
+		tokenString, err := token.SignedString([]byte(appKey))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
