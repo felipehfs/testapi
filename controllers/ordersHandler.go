@@ -34,3 +34,23 @@ func CreateOrder(db *sql.DB) http.Handler {
 		json.NewEncoder(w).Encode(created)
 	})
 }
+
+// ReadOrder retrieves all orders
+func ReadOrder(db *sql.DB) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		orderDao := models.NewOrderDao(db)
+
+		user := r.Context().Value("user")
+		claims := user.(*jwt.Token).Claims.(jwt.MapClaims)
+		id := int64(claims["id"].(float64))
+
+		orders, err := orderDao.Read(id)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		json.NewEncoder(w).Encode(orders)
+	})
+}

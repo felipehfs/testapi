@@ -29,3 +29,28 @@ func (dao *OrderDao) Create(order Order) (*Order, error) {
 
 	return &order, nil
 }
+
+// Read retrieves all orders created by logged user
+func (dao *OrderDao) Read(author int64) ([]Order, error) {
+
+	var orders []Order
+	rows, err := dao.DB.Query("SELECT * FROM orders WHERE author = $1", author)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var order Order
+		rows.Scan(
+			&order.ID,
+			&order.Status,
+			&order.CustomerID,
+			&order.ProductID,
+			&order.Author)
+
+		orders = append(orders, order)
+	}
+
+	return orders, nil
+}
