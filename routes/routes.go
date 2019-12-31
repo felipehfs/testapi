@@ -23,6 +23,7 @@ func Routes(conn *sql.DB, r *mux.Router) {
 
 	createOrder := controllers.AuthMiddleware(controllers.CreateOrder(conn))
 	readOrder := controllers.AuthMiddleware(controllers.ReadOrder(conn))
+	updateOrder := controllers.AuthMiddleware(controllers.UpdateOrder(conn))
 
 	r.Handle("/login", controllers.Login(conn)).Methods("POST")
 	r.Handle("/register", controllers.Register(conn)).Methods("POST")
@@ -40,4 +41,5 @@ func Routes(conn *sql.DB, r *mux.Router) {
 
 	r.Handle("/orders", createOrder).Methods("POST")
 	r.Handle("/orders", readOrder).Methods("GET")
+	r.Handle("/orders/{id}", updateOrder).Methods("PUT")
 }

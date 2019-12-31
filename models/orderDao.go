@@ -30,6 +30,25 @@ func (dao *OrderDao) Create(order Order) (*Order, error) {
 	return &order, nil
 }
 
+// Update changes the orders
+func (dao *OrderDao) Update(order Order, id string) (*Order, error) {
+	query := `
+		UPDATE orders SET status=$2, customerid=$3, productid=$4
+		WHERE id=$1 
+	`
+	stmt, err := dao.DB.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = stmt.Exec(order.ID, order.Status, order.CustomerID, order.ProductID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &order, nil
+}
+
 // Read retrieves all orders created by logged user
 func (dao *OrderDao) Read(author int64) ([]Order, error) {
 
