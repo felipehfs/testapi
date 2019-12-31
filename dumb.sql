@@ -24,8 +24,8 @@ CREATE TABLE customers (
 CREATE TABLE orders (
     id SERIAL PRIMARY KEY,
     status INTEGER DEFAULT 3,
-    customerId INTEGER REFERENCES customers(id),
-    productId INTEGER REFERENCES products(id)
+    customerid INTEGER REFERENCES customers(id),
+    productid INTEGER REFERENCES products(id)
 );
 
 ALTER TABLE orders ADD COLUMN author INTEGER REFERENCES users(id);
