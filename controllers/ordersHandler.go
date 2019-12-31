@@ -83,3 +83,19 @@ func UpdateOrder(db *sql.DB) http.Handler {
 		json.NewEncoder(w).Encode(saved)
 	})
 }
+
+// FindOrder returns the order by ID
+func FindOrder(db *sql.DB) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		orderDao := models.NewOrderDao(db)
+		orders, err := orderDao.Find(vars["id"])
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		json.NewEncoder(w).Encode(orders)
+	})
+}

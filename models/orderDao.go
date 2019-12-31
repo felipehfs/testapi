@@ -30,6 +30,54 @@ func (dao *OrderDao) Create(order Order) (*Order, error) {
 	return &order, nil
 }
 
+// Find searches the Order and shows a complete information
+func (dao *OrderDao) Find(id string) (map[string]interface{}, error) {
+	query := `
+		SELECT 
+			o.id, o.status, o.author,
+			p.name, p.price,
+			c.id, c.name, c.email
+		FROM 
+			orders o 
+		INNER JOIN products p ON o.productid = p.id
+		INNER JOIN customers c ON o.customerid = c.id
+		WHERE o.id = $1
+	`
+	var orderID int
+	var status int
+	var orderAuthor int
+	var name string
+	var price float64
+	var customerID int
+	var customerName string
+	var customerEmail string
+
+	order := make(map[string]interface{})
+
+	err := dao.DB.QueryRow(query, id).Scan(&orderID, &status, &orderAuthor,
+		&name, &price, &customerID, &customerName, &customerEmail)
+	if err != nil {
+		return nil, err
+	}
+
+	order["product"] = map[string]interface{}{
+		"name":  name,
+		"price": price,
+	}
+
+	order["order"] = map[string]interface{}{
+		"id":     orderID,
+		"status": status,
+	}
+
+	order["customer"] = map[string]interface{}{
+		"id":    customerID,
+		"name":  customerName,
+		"email": customerEmail,
+	}
+	return order, nil
+}
+
 // Update changes the orders
 func (dao *OrderDao) Update(order Order, id string) (*Order, error) {
 	query := `
