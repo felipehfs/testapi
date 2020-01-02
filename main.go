@@ -6,8 +6,8 @@ import (
 
 	"github.com/felipehfs/testapi/config"
 	"github.com/felipehfs/testapi/routes"
-	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 func main() {
@@ -19,11 +19,15 @@ func main() {
 
 	defer conn.Close()
 	r := mux.NewRouter()
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		Debug:            true,
+		AllowedHeaders:   []string{"Content-Type", "X-Requested-With", "Authorization"},
+		AllowCredentials: true,
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+	})
+
 	routes.Routes(conn, r)
 
-	headers := handlers.AllowedHeaders([]string{"Content-Type", "Authorization", "X-Request-With"})
-	methods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"})
-	origins := handlers.AllowedOrigins([]string{"*"})
-
-	log.Fatal(http.ListenAndServe(":8080", handlers.CORS(headers, methods, origins)(r)))
+	log.Fatal(http.ListenAndServe(":8080", c.Handler(r)))
 }
