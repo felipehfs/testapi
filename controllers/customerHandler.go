@@ -20,6 +20,11 @@ func CreateCustomer(db *sql.DB) http.Handler {
 			return
 		}
 
+		if err := customer.IsValid(); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
 		createdCustomer, err := customerDao.Create(customer)
 
 		if err != nil {

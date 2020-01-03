@@ -26,6 +26,11 @@ func CreateProduct(db *sql.DB) http.Handler {
 			return
 		}
 
+		if err := product.IsValid(); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
 		id := int64(mapClaims["id"].(float64))
 
 		product.UserID = sql.NullInt64{

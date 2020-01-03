@@ -21,6 +21,11 @@ func CreateOrder(db *sql.DB) http.Handler {
 			return
 		}
 
+		if err := request.IsValid(); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
 		user := r.Context().Value("user")
 		claims := user.(*jwt.Token).Claims.(jwt.MapClaims)
 		activeID := int64(claims["id"].(float64))

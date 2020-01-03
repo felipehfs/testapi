@@ -39,9 +39,14 @@ func Register(db *sql.DB) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var user models.User
 		userDao := models.NewUserDao(db)
-
+		defer r.Body.Close()
 		if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 			http.Error(w, "Erro na sintaxe do JSON", http.StatusBadRequest)
+			return
+		}
+
+		if err := user.IsValid(); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
@@ -92,6 +97,7 @@ func Login(db *sql.DB) http.Handler {
 		var request map[string]string
 		userDao := models.NewUserDao(db)
 
+		defer r.Body.Close()
 		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
