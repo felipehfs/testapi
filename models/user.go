@@ -10,6 +10,7 @@ type User struct {
 	Password string `json:"password,omitempty" validate:"required"`
 }
 
+// IsValid checks if each field is correct
 func (user User) IsValid() error {
 	validate := validator.New()
 	return validate.Struct(user)
